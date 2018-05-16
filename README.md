@@ -6,7 +6,7 @@ This is a prototype of what a deep cast package might look like.
 
 Simple schema can be defined and used like this:
 
-```
+```dart
   // Lists
   const schema = cast.List(cast.int);
   List<dynamic> someList = ....;
@@ -14,7 +14,7 @@ Simple schema can be defined and used like this:
   var typedList = schema.cast(someList);  
 ```
 
-```
+```dart
   // Maps
   const schema = cast.Map(cast.String, cast.int);
   Map<dynamic, dynamic> someMap = ....;
@@ -23,7 +23,8 @@ Simple schema can be defined and used like this:
 ```
 
 Casts can be applied arbitrarily deep:
-```
+
+```dart
   // Maps
   const schema = cast.Map(cast.String, cast.List(cast.int));
   Map<dynamic, dynamic> someMap = ....;
@@ -39,7 +40,7 @@ Casts can be applied arbitrarily deep:
 
 Complex schemas with different types for different fields can also be defined:
 
-```
+```dart
    const typed = cast.Keyed<String, dynamic>({
       "id": cast.int,
       "fields": cast.Keyed({"field1": cast.int, "field2": cast.int}),
@@ -50,7 +51,7 @@ Complex schemas with different types for different fields can also be defined:
 
 Given structured data matching that schema:
 
-```
+```dart
  var json = <String, dynamic>{
     "id": 0,
     "fields": <String, dynamic>{"field1": 1, "field2": 2},
@@ -61,7 +62,7 @@ Given structured data matching that schema:
 
 Applying the cast gives back a deeply cast object of the right type:
 
-```
+```dart
 Map<String, dynamic> result = typed.cast(json);
 Map<String, int> fields = result["fields"]; // Implicit cast will not fail
 ```
