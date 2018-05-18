@@ -5,6 +5,11 @@ import 'package:test/test.dart';
 import 'package:cast/cast.dart' as cast;
 
 void main() {
+  test("any casts", () {
+    expect(cast.any.cast(3), 3);
+    expect(cast.any.cast("hello"), "hello");
+  });
+
   test("int casts", () {
     expect(cast.int.cast(3), 3);
     expect(

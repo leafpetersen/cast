@@ -23,6 +23,11 @@ abstract class Cast<T> {
   T cast(dynamic from) => _cast(from, "toplevel", null);
 }
 
+class AnyCast extends Cast<dynamic> {
+  const AnyCast();
+  dynamic _cast(dynamic from, core.String context, dynamic key) => from;
+}
+
 class IntCast extends Cast<core.int> {
   const IntCast();
   core.int _cast(dynamic from, core.String context, dynamic key) =>
@@ -108,12 +113,15 @@ class List<E> extends Cast<core.List<E>> {
 
 class Keyed<K, V> extends Cast<core.Map<K, V>> {
   final core.Map<K, Cast<V>> _map;
-  const Keyed(core.Map<K, Cast<V>> map) : _map = map;
+  final Cast<V> _otherwise;
+  const Keyed(core.Map<K, Cast<V>> map, {Cast<V> otherwise})
+      : _map = map,
+        _otherwise = otherwise;
   core.Map<K, V> _cast(dynamic from, core.String context, dynamic key) {
     core.Map<K, V> result = {};
     if (from is core.Map) {
       for (K key in from.keys) {
-        var entry = _map[key];
+        var entry = _map[key] ?? _otherwise;
         if (entry == null)
           throw new FailedCast("map entry", key, "key not found");
         result[key] = entry._cast(from[key], "map entry", key);
@@ -160,6 +168,7 @@ class Future<E> extends Cast<async.Future<E>> {
   }
 }
 
+const any = AnyCast();
 const bool = BoolCast();
 const int = IntCast();
 const double = DoubleCast();

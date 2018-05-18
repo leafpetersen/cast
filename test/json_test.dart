@@ -39,6 +39,32 @@ void main() {
     expect(result["extra2"][0], json["extra2"][0]);
   });
 
+  test("type casting with defaults", () {
+    const typed = cast.Keyed<String, dynamic>({
+      "fields": cast.Keyed({"field1": cast.int, "field2": cast.int}),
+      "extra1": cast.OneOf(cast.String, cast.List(cast.String)),
+      "extra2": cast.OneOf(cast.String, cast.List(cast.String)),
+    }, otherwise: cast.any);
+    var result = typed.cast(json);
+
+    expect(result is Map<String, dynamic>, isTrue);
+
+    expect(result["id"] is int, isTrue);
+    expect(result["id"], json["id"]);
+
+    expect(result["fields"] is Map<String, int>, isTrue);
+    Map<String, int> fields = result["fields"];
+    expect(fields["field1"], json["fields"]["field1"]);
+    expect(fields["field2"], json["fields"]["field2"]);
+
+    expect(result["extra1"] is String, isTrue);
+    expect(result["extra1"], json["extra1"]);
+
+    expect(result["extra2"] is List<String>, isTrue);
+    expect(result["extra2"][0] is String, isTrue);
+    expect(result["extra2"][0], json["extra2"][0]);
+  });
+
   test("Casting to custom classes", () {
     var schema = MyCustomClass.schema(cast.Keyed({
       "id": cast.int,
