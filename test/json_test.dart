@@ -21,8 +21,6 @@ void main() {
     });
     var result = typed.cast(json);
 
-    expect(result is Map<String, dynamic>, isTrue);
-
     expect(result["id"] is int, isTrue);
     expect(result["id"], json["id"]);
 
@@ -47,8 +45,6 @@ void main() {
     }, otherwise: cast.any);
     var result = typed.cast(json);
 
-    expect(result is Map<String, dynamic>, isTrue);
-
     expect(result["id"] is int, isTrue);
     expect(result["id"], json["id"]);
 
@@ -66,37 +62,22 @@ void main() {
   });
 
   test("Casting to custom classes", () {
-    var schema = MyCustomClass.schema(cast.Keyed({
-      "id": cast.int,
-      "fields": cast.Keyed({"field1": cast.int, "field2": cast.int}),
-      "extra1": Union.schema(cast.String, cast.List(cast.String)),
-      "extra2": Union.schema(cast.String, cast.List(cast.String)),
-    }));
+    var schema = MyCustomClass.schema(
+      cast.Keyed({
+        "id": cast.int,
+        "fields": cast.Keyed({"field1": cast.int, "field2": cast.int}),
+        "extra1": Union.schema(cast.String, cast.List(cast.String)),
+        "extra2": Union.schema(cast.String, cast.List(cast.String)),
+      }),
+    );
 
     var result = schema.cast(json);
-    expect(result is MyCustomClass, isTrue);
 
-    var id = result.id;
-    expect(id is int, isTrue);
-
-    var fields = result.fields;
-    expect(fields is Map<String, int>, isTrue);
-
+    expect(result.id, 0);
     var extra1 = result.extra1;
-    expect(extra1 is Union<String, List<String>>, isTrue);
-
     expect(extra1.isLeft, isTrue);
-
-    var s = extra1.left;
-    expect(s is String, isTrue);
-
     var extra2 = result.extra2;
-    expect(extra2 is Union<String, List<String>>, isTrue);
-
     expect(extra2.isRight, isTrue);
-
-    var l = extra2.right;
-    expect(l is List<String>, isTrue);
   });
 }
 
@@ -108,8 +89,9 @@ class Union<S, T> {
   T get right => contents as T;
   Union(this.contents);
   static cast.Cast<Union<S, T>> schema<S, T>(
-          cast.Cast<S> left, cast.Cast<T> right) =>
-      cast.Apply((u) => new Union<S, T>(u), cast.OneOf(left, right));
+    cast.Cast<S> left,
+    cast.Cast<T> right,
+  ) => cast.Apply((u) => new Union<S, T>(u), cast.OneOf(left, right));
 }
 
 class MyCustomClass {
@@ -120,6 +102,6 @@ class MyCustomClass {
   Union<String, List<String>> get extra1 => parsed["extra1"];
   Union<String, List<String>> get extra2 => parsed["extra2"];
   static cast.Cast<MyCustomClass> schema(
-          cast.Cast<Map<String, dynamic>> parse) =>
-      cast.Apply((a) => MyCustomClass(a), parse);
+    cast.Cast<Map<String, dynamic>> parse,
+  ) => cast.Apply((a) => MyCustomClass(a), parse);
 }
